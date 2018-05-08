@@ -13,9 +13,18 @@ app.get('/', (req, res) => {
 
 // refactoring this part later
 // http://console.developers.google.com
+
 passport.use(new GoogleStrategy({
     clientID: keys.googleClientID,
-    clientSecret: keys.googleClientSecret
+    clientSecret: keys.googleClientSecret,
+    callbackURL: '/auth/google/callback'
+  }, (accessToken) => {
+    console.log('token: ', accessToken);
+  })
+);
+
+app.get('/auth/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
   })
 );
 
