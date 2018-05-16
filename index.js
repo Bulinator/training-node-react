@@ -1,9 +1,13 @@
 const express = require('express');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const keys = require('./config/keys.js');
+const mongoose = require('mongoose');
+// execute passport strategy
+require('./services/passport');
 // generate new app
 const app = express();
+
+// call authRoutes (js tricks)
+// require return a function, with an immediately invokes app
+require('./routes/authRoutes')(app);
 
 /*
 app.get('/', (req, res) => {
@@ -14,20 +18,8 @@ app.get('/', (req, res) => {
 // refactoring this part later
 // http://console.developers.google.com
 
-passport.use(new GoogleStrategy({
-    clientID: keys.googleClientID,
-    clientSecret: keys.googleClientSecret,
-    callbackURL: '/auth/google/callback'
-  }, (accessToken) => {
-    console.log('token: ', accessToken);
-  })
-);
-
-app.get('/auth/google', passport.authenticate('google', {
-    scope: ['profile', 'email']
-  })
-);
-
 // run server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT);
+app.listen(PORT, () => {
+  console.log(`Bulinator dev server is running on port ${PORT}`);
+});
