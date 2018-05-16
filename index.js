@@ -1,15 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieSession = require('cookie-session');
 const keys = require('./config/keys');
-// execute passport strategy
+// load User model
 require('./models/User');
-require('./services/passport');
+// execute passport strategy
+const passport = require('passport');
 
 // connect mongoodb
 mongoose.connect(keys.mongoURI);
 
 // generate new app
 const app = express();
+
+app.use(
+  cookieSession({
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in seconds
+    keys: [keys.cookieKey]
+  })
+);
+
+// load cookie session in passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // call authRoutes (js tricks)
 // require return a function, with an immediately invokes app
