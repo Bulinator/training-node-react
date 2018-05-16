@@ -1,11 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
+const passport = require('passport');
 const keys = require('./config/keys');
 // load User model
 require('./models/User');
 // execute passport strategy
-const passport = require('passport');
+require('passport');
 
 // connect mongoodb
 mongoose.connect(keys.mongoURI);
