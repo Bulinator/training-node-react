@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const keys = require('./config/keys');
 // execute passport strategy
+require('./models/User');
 require('./services/passport');
 
 // connect mongoodb
