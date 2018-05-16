@@ -62,3 +62,6 @@ typings/
 
 # secure key
 config/keys.js
+
+# Mac file
+.DS_Store
