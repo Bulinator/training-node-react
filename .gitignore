@@ -61,7 +61,7 @@ typings/
 .next
 
 # secure key
-config/keys.js
+config/
 
 # Mac file
 .DS_Store
