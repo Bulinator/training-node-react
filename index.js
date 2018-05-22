@@ -22,7 +22,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 require('./routes/authRoutes')(app);
-require('./routes/BillingRoutes')(app);
+require('./routes/billingRoutes')(app);
 
 // running only in production mode
 if (process.env.NODE_ENV === 'production') {
