@@ -10,7 +10,7 @@ const surveyTemplate = require('../services/emailTemplates/surveyTemplate');
 const Survey = mongoose.model('surveys');
 
 module.exports = app => {
-  app.get('/api/surveys/thanks', (req, res) => {
+  app.get('/api/surveys/:surveyId/:choice', (req, res) => {
     res.send('Thanks for voting');
   });
 
@@ -18,7 +18,7 @@ module.exports = app => {
     // create new parser and extract data
     const p = new Path('/api/surveys/:surveyId/:choice');
 
-    const events = _.chain(req.body)
+    _.chain(req.body)
       .map(({ email, url }) => {
         // extract route name, destructuring with _chain
         const match = p.test(new URL(url).pathname); // create object of routing match
@@ -29,6 +29,18 @@ module.exports = app => {
       // remove all array element equal to undefinded
       .compact()
       .uniqBy('email', 'surveyId')
+      .each(({ surveyId, email, choice }) => {
+        Survey.updateOne({
+          _id: surveyId,
+          recipients: {
+            $elemMatch: { email: email, responded: false }
+          }
+        }, {
+          $inc: { [choice]: 1 },
+          $set: { 'recipients.$.responded': true },
+          lastResponded: new Date()
+        }).exec();
+      })
       .value();
 
   /*
@@ -48,7 +60,7 @@ module.exports = app => {
     const uniqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
     */
 
-    console.log(events);
+    //console.log(events);
 
     res.send({});
   });
