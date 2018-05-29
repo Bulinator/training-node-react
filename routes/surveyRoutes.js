@@ -1,3 +1,6 @@
+const _ = require('lodash');
+const Path = require('path-parser');
+const { URL } = require('url');
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
 const requireCredits = require('../middlewares/requireCredits');
@@ -9,6 +12,45 @@ const Survey = mongoose.model('surveys');
 module.exports = app => {
   app.get('/api/surveys/thanks', (req, res) => {
     res.send('Thanks for voting');
+  });
+
+  app.post('/api/surveys/webhooks', (req, res) => {
+    // create new parser and extract data
+    const p = new Path('/api/surveys/:surveyId/:choice');
+
+    const events = _.chain(req.body)
+      .map(({ email, url }) => {
+        // extract route name, destructuring with _chain
+        const match = p.test(new URL(url).pathname); // create object of routing match
+        if (match) {
+          return { email, surveyId: match.surveyId, choice: match.choice };
+        }
+      })
+      // remove all array element equal to undefinded
+      .compact()
+      .uniqBy('email', 'surveyId')
+      .value();
+
+  /*
+    const events = _.map(req.body, ({ email, url }) => {
+      console.log(url);
+      const p = new Path('/api/surveys/:surveyId/:choice');
+      // extract route name
+      const pathname = new URL(url).pathname;
+      const match = p.test(pathname); // create object of routing match
+      if (match) {
+        return { email, surveyId: match.surveyId, choice: match.choice };
+      }
+    });
+
+    // remove all array element equal to undefinded
+    const compactEvents = _.compact(events);
+    const uniqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+    */
+
+    console.log(events);
+
+    res.send({});
   });
 
   app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
